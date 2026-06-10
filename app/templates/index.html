@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bangalore House Price Predictor</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #23263a;
+      --accent:    #6c63ff;
+      --accent2:   #a78bfa;
+      --success:   #22d3a5;
+      --danger:    #f87171;
+      --text:      #e2e8f0;
+      --muted:     #94a3b8;
+      --border:    rgba(255,255,255,0.08);
+      --radius:    14px;
+      --shadow:    0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Hero header ────────────────────────────────────────────────── */
+    header {
+      width: 100%;
+      padding: 48px 24px 32px;
+      text-align: center;
+      background: linear-gradient(135deg, #1a1d27 0%, #12142a 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    header .badge {
+      display: inline-block;
+      background: rgba(108,99,255,0.15);
+      color: var(--accent2);
+      border: 1px solid rgba(108,99,255,0.35);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      padding: 4px 14px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    /* ── Main card ──────────────────────────────────────────────────── */
+    main {
+      width: 100%;
+      max-width: 560px;
+      padding: 32px 16px 64px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Form elements ──────────────────────────────────────────────── */
+    .form-group {
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 0.97rem;
+      padding: 12px 16px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+      appearance: none;
+    }
+
+    select:focus, input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108,99,255,0.2);
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ── Predict button ─────────────────────────────────────────────── */
+    button#predict-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 15px;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button#predict-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    button#predict-btn:active { transform: translateY(0); }
+    button#predict-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* spinner inside button */
+    .btn-spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      position: absolute;
+      right: 18px; top: 50%; transform: translateY(-50%);
+    }
+    @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+
+    /* ── Result panel ───────────────────────────────────────────────── */
+    #result-panel {
+      margin-top: 24px;
+      display: none;
+    }
+
+    .result-box {
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .result-box.success {
+      background: rgba(34,211,165,0.08);
+      border: 1px solid rgba(34,211,165,0.25);
+    }
+
+    .result-box.error {
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.25);
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .result-price {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--success);
+      line-height: 1;
+    }
+
+    .result-price span.unit {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--muted);
+      vertical-align: super;
+    }
+
+    .result-note {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.95rem;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      margin-top: auto;
+      padding: 24px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      width: 100%;
+    }
+
+    footer a { color: var(--accent2); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="badge">ML Project</div>
+  <h1>🏠 Bangalore House Price Predictor</h1>
+  <p>Estimate residential property prices powered by machine learning</p>
+</header>
+
+<main>
+  <div class="card">
+
+    <div class="form-group">
+      <label for="location">Location</label>
+      <select id="location" name="location">
+        <option value="" disabled selected>Select a location…</option>
+        {% for loc in locations %}
+        <option value="{{ loc }}">{{ loc }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="sqft">Total Area (sq ft)</label>
+      <input type="number" id="sqft" name="sqft" min="100" max="50000"
+             placeholder="e.g. 1200" />
+    </div>
+
+    <div class="row-2">
+      <div class="form-group">
+        <label for="bhk">BHK</label>
+        <input type="number" id="bhk" name="bhk" min="1" max="20"
+               placeholder="e.g. 2" />
+      </div>
+      <div class="form-group">
+        <label for="bath">Bathrooms</label>
+        <input type="number" id="bath" name="bath" min="1" max="20"
+               placeholder="e.g. 2" />
+      </div>
+    </div>
+
+    <button id="predict-btn" onclick="predict()">
+      Predict Price
+      <div class="btn-spinner" id="spinner"></div>
+    </button>
+
+    <div id="result-panel">
+      <div id="result-box" class="result-box"></div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  Built by <strong>Ramyasrivalli</strong> ·
+  <a href="https://github.com/Ramyasrivalli/Bangalore-House-Price-Prediction" target="_blank">GitHub</a> ·
+  Bangalore House Price Prediction
+</footer>
+
+<script>
+  async function predict() {
+    const btn = document.getElementById('predict-btn');
+    const spinner = document.getElementById('spinner');
+    const panel = document.getElementById('result-panel');
+    const box = document.getElementById('result-box');
+
+    // Read inputs
+    const location = document.getElementById('location').value;
+    const sqft     = parseFloat(document.getElementById('sqft').value);
+    const bhk      = parseInt(document.getElementById('bhk').value);
+    const bath     = parseInt(document.getElementById('bath').value);
+
+    // Client-side validation
+    if (!location) {
+      showError('Please select a location.'); return;
+    }
+    if (!sqft || sqft <= 0) {
+      showError('Please enter a valid area in sq ft.'); return;
+    }
+    if (!bhk || bhk <= 0) {
+      showError('Please enter a valid BHK count.'); return;
+    }
+    if (!bath || bath <= 0) {
+      showError('Please enter a valid bathroom count.'); return;
+    }
+
+    // Loading state
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    panel.style.display = 'none';
+
+    try {
+      const resp = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location, sqft, bath, bhk })
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok || data.error) {
+        showError(data.error || 'Prediction failed. Please try again.');
+      } else {
+        const price = data.price.toFixed(2);
+        const crore = (data.price / 100).toFixed(3);
+
+        box.className = 'result-box success';
+        box.innerHTML = `
+          <div class="result-label">Estimated Price</div>
+          <div class="result-price">
+            <span class="unit">₹</span>${price}<span class="unit"> L</span>
+          </div>
+          <div class="result-note">
+            ≈ ₹${crore} Crore &nbsp;·&nbsp;
+            ${location} &nbsp;·&nbsp; ${bhk} BHK &nbsp;·&nbsp; ${sqft} sq ft
+          </div>
+        `;
+        panel.style.display = 'block';
+      }
+    } catch (err) {
+      showError('Network error. Is the server running?');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+    }
+
+    function showError(msg) {
+      box.className = 'result-box error';
+      box.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`;
+      panel.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>
