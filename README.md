@@ -359,90 +359,6 @@ open htmlcov/index.html
 
 
 
-
-
-
-🏠 How to Run – Bangalore House Price Predictor
-> **Important:** Never open `index.html` directly in your browser.  
-> This app needs a Flask server to work. Follow the steps below.
----
-✅ Prerequisites
-Make sure you have installed:
-Python 3.10+ → Download here  
-(During install on Windows: tick ✅ "Add Python to PATH")
-Git (optional, only needed if cloning) → Download here
----
-📁 Step 1 — Open the Project Folder in Terminal
-Option A: Using VS Code
-Open the folder `Bangalore-House-Price-Prediction` in VS Code
-Press Ctrl + ` (backtick) to open the integrated terminal
-Make sure the terminal shows this path:
-```
-   C:\...\Bangalore-House-Price-Prediction>
-   ```
-If it shows the parent folder, run:
-```bash
-   cd Bangalore-House-Price-Prediction
-   ```
-Option B: Using Windows PowerShell / CMD
-Open PowerShell or Command Prompt
-Navigate to the project:
-```bash
-   cd C:\Users\YourName\Downloads\Bangalore-House-Price-Prediction_1\Bangalore-House-Price-Prediction
-   ```
----
-📦 Step 2 — Install Dependencies
-Run this once (you only need to do this the first time):
-```bash
-pip install -r requirements.txt
-```
-If that doesn't work, install manually:
-```bash
-pip install flask scikit-learn numpy pandas
-```
----
-🧠 Step 3 — Train the Model
-Run this once to generate the ML model file:
-```bash
-python train.py
-```
-⏳ This takes 2–5 minutes. You'll see logs like:
-```
-INFO | Training Pipeline
-INFO | Loaded 13320 rows
-INFO | Best model: linear_regression (R²=0.847)
-INFO | Model saved to models/trained_model.pkl ✅
-```
-> **Skip this step** if `models/trained_model.pkl` already exists in the folder.
----
-🚀 Step 4 — Start the Web Server
-```bash
-python app/app.py
-```
-You should see:
-```
- * Running on http://127.0.0.1:5000
- * Press CTRL+C to quit
-```
----
-🌐 Step 5 — Open the App in Browser
-Open your browser and go to:
-```
-http://127.0.0.1:5000
-```
-> ❌ Do NOT open the `index.html` file directly  
-> ✅ Always use `http://127.0.0.1:5000` after starting the server
----
-🎯 How to Use the App
-Field	Example Value
-Location	Indiranagar
-Total Area (sq ft)	1200
-BHK	2
-Bathrooms	2
-Click Predict Price → You'll see the estimated price in ₹ Lakhs and Crores.
----
-🛑 How to Stop the Server
-Press Ctrl + C in the terminal.
 ---
 ❓ Common Issues
 Problem	Fix
@@ -452,6 +368,8 @@ Problem	Fix
 `trained_model.pkl not found`	Run `python train.py` first
 Location shows `{{ loc }}`	You opened the HTML file directly — use `http://127.0.0.1:5000` instead
 Price shows ₹0.00	Input values are unrealistic (e.g. 88 BHK) — use normal values
+
+
 ---
 📋 Quick Summary (All Commands)
 ```bash
