@@ -1,8 +1,4 @@
-# Project Report: Bangalore House Price Prediction
-
-**Author:** Ramyasrivalli  
-**Institution:** Shri Vishnu Engineering College for Women (AI Department)  
-**Date:** 2025  
+# Project Report: Bangalore House Price Prediction 
 **GitHub:** [Bangalore-House-Price-Prediction](https://github.com/Ramyasrivalli/Bangalore-House-Price-Prediction)
 
 ---
